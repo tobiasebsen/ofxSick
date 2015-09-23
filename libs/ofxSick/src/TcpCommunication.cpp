@@ -30,6 +30,9 @@ bool CTcpCommunication::Connect(std::string targetAddress, int targetPort)
     try
     {
         client.SetTimeoutAccept(1);
+        client.SetTimeoutReceive(1);
+        client.SetTimeoutSend(1);
+        client.SetNonBlocking(false);
         connected = client.Connect((char*)targetAddress.c_str(), targetPort);
         client.SetNonBlocking(true);
         //stream = client->GetStream();

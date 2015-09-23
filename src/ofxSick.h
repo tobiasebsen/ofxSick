@@ -11,3 +11,4 @@
 #include "Scan.h"
 #include "Plot.h"
 #include "Blobs.h"
+#include "Tracker.h"

@@ -11,7 +11,7 @@ using namespace ofxSick;
 
 void Blobs::update(ofxSick::Plot &plot, float threshold) {
     
-    blobs.clear();
+    vector<Blob>::clear();
     labels.resize(plot.size());
     int label = -1;
     numUniqueLabels = 0;
@@ -55,8 +55,7 @@ void Blobs::update(ofxSick::Plot &plot, float threshold) {
                 Blob blob;
                 blob.center.set(m10/m00, m01/m00);
                 blob.mass = mag;
-                blob.mapped.set(0.);
-                blobs.push_back(blob);
+                vector<Blob>::push_back(blob);
                 
                 m00 = 0.;
                 m10 = 0.;
@@ -70,12 +69,19 @@ void Blobs::update(ofxSick::Plot &plot, float threshold) {
     numUniqueLabels = label;
 }
 
+void Blobs::draw() {
+    for (int i=0; i<this->size(); i++) {
+        Blob & blob = this->at(i);
+        ofEllipse(blob.center, blob.mass, blob.mass);
+    }
+}
+
 void Blobs::filterByMass(float min, float max) {
 
-    for (auto it=blobs.begin(); it!=blobs.end(); ) {
+    for (auto it=this->begin(); it!=this->end(); ) {
         Blob & blob = *it;
         if (blob.mass < min || blob.mass > max) {
-            it = blobs.erase(it);
+            it = vector<Blob>::erase(it);
         }
         else {
             ++it;
@@ -85,46 +91,28 @@ void Blobs::filterByMass(float min, float max) {
 
 void Blobs::groupByDistance(float maxDistance) {
 
-    for (int i=0; i<blobs.size(); i++) {
-        Blob & a = blobs[i];
-        for (int j=0; j<blobs.size(); ) {
-            Blob & b = blobs[j];
+    for (int i=0; i<this->size(); i++) {
+        Blob & a = this->at(i);
+        for (int j=0; j<this->size(); ) {
+            Blob & b = this->at(j);
             
-            float dist = a.center.distance(b.center) - a.mass*0.5 - b.mass*0.5;
-            
-            if (dist > 0. && dist < maxDistance) {
-                float pct = b.mass / (a.mass + b.mass);
-                a.center.interpolate(b.center, pct);
-                a.mass += b.mass;
-                blobs.erase(blobs.begin()+j);
-                i--;
+            float dist = a.center.distance(b.center);
+
+            if (dist != 0.) {
+                dist -= a.mass*0.5 + b.mass*0.5, 0.;
+                if (dist < maxDistance) {
+                    float pct = b.mass / (a.mass + b.mass);
+                    a.center.interpolate(b.center, pct);
+                    a.mass = a.mass + b.mass;
+                    vector<Blob>::erase(this->begin()+j);
+                    if (j < i)
+                        i--;
+                    j--;
+                }
             }
-            else {
-                j++;
-            }
+            j++;
         }
     }
-}
-
-void Blobs::erase(int index) {
-    blobs.erase(blobs.begin()+index);
-}
-
-size_t Blobs::size() const {
-    return blobs.size();
-}
-
-Blob & Blobs::operator[](int index) {
-    return blobs[index];
-}
-
-const Blob & Blobs::operator[](int index) const {
-    return blobs[index];
-}
-
-Blobs & Blobs::operator=(const Blobs & other) {
-    blobs.assign(other.blobs.begin(), other.blobs.end());
-    return *this;
 }
 
 vector<int> & Blobs::getLabels() {
