@@ -27,16 +27,16 @@ void Blobs::update(ofxSick::Plot &plot, float threshold) {
     for (int i=0; i<plot.size(); i++) {
 
         ofVec2f & a = plot[i];
-        bool near = false;
+        bool isnear = false;
         
         for (int j=i+1; j<MIN(plot.size(),i+2); j++) {
 
             ofVec2f & b = plot[j];
             if (i != j && a.distance(b) < threshold) {
-                near = true;
+                isnear = true;
             }
         }
-        if (near) {
+        if (isnear) {
             if (!wasnear) label++;
             
             float length = a.length();
@@ -64,7 +64,7 @@ void Blobs::update(ofxSick::Plot &plot, float threshold) {
             }
             labels[i] = -1;
         }
-        wasnear = near;
+        wasnear = isnear;
     }
     numUniqueLabels = label;
 }
