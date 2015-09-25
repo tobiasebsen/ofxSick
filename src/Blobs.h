@@ -27,6 +27,7 @@ namespace ofxSick {
         void draw();
         
         void filterByMass(float min, float max);
+        void filterShadows(float angle);
         void erase(int index);
         void groupByDistance(float maxDistance);
         

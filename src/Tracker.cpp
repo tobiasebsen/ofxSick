@@ -11,16 +11,16 @@ using namespace ofxSick;
 
 Tracker::Tracker() {
     uidcounter = 0;
-    timeout = 1000*100; // 1/10 second
+    timeout = 1000*200; // 2/10 second
 }
 
 void Tracker::update(uint64_t now) {
 
     for (int j=0; j<this->size(); ) {
         TrackedBlob & blob = this->at(j);
-        if (blob.time_last < now) {
-            blob.center += blob.velocity * ofGetElapsedTimef();
-            ofNotifyEvent(updateBlob, blob);
+        if (blob.time_last < now) { // estimation
+            //blob.center += blob.velocity * ofGetElapsedTimef();
+            //ofNotifyEvent(updateBlob, blob);
         }
         if (now - blob.time_last > timeout) {
             ofNotifyEvent(removeBlob, blob);

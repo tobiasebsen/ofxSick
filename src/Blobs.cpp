@@ -89,6 +89,32 @@ void Blobs::filterByMass(float min, float max) {
     }
 }
 
+void Blobs::filterShadows(float angle) {
+
+    for (int i=0; i<this->size(); i++) {
+        Blob & a = this->at(i);
+        for (int j=0; j<this->size(); ) {
+            Blob & b = this->at(j);
+            
+            float absangle = ABS(a.center.angle(b.center));
+            
+            if (absangle != 0. && absangle < angle) {
+                if (a.center.length() < b.center.length()) {
+                    vector<Blob>::erase(this->begin()+j);
+                    if (j < i)
+                        i--;
+                    j--;
+                }
+                else
+                    j++;
+            }
+            else {
+                j++;
+            }
+        }
+    }
+}
+
 void Blobs::groupByDistance(float maxDistance) {
 
     for (int i=0; i<this->size(); i++) {
